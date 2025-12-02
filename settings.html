@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Manager — Settings</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+      background: #0a0a0a;
+      color: #d0d0d0;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 48px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .header p {
+      color: #606060;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    /* Settings sections */
+    .settings-section {
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #505050;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid #151515;
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-info {
+      flex: 1;
+      padding-right: 16px;
+    }
+
+    .setting-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #e0e0e0;
+    }
+
+    .setting-description {
+      font-size: 12px;
+      color: #505050;
+      margin-top: 2px;
+    }
+
+    /* Toggle Switch */
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #252525;
+      transition: background-color 0.2s;
+      border-radius: 12px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #606060;
+      transition: transform 0.2s, background-color 0.2s;
+      border-radius: 50%;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background-color: #1a3d14;
+    }
+
+    .toggle input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+      background-color: #c9f042;
+    }
+
+    /* Select dropdown */
+    .setting-select {
+      background: #151515;
+      color: #c0c0c0;
+      border: 1px solid #252525;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      min-width: 130px;
+      font-family: inherit;
+    }
+
+    .setting-select:focus {
+      outline: none;
+      border-color: #404040;
+    }
+
+    .setting-select:hover {
+      border-color: #353535;
+    }
+
+    /* Number input */
+    .setting-number {
+      background: #151515;
+      color: #c0c0c0;
+      border: 1px solid #252525;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      width: 70px;
+      text-align: center;
+      font-family: inherit;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .setting-number:focus {
+      outline: none;
+      border-color: #404040;
+    }
+
+    .setting-number:hover {
+      border-color: #353535;
+    }
+
+    /* Footer actions */
+    .footer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 32px;
+      border-top: 1px solid #1a1a1a;
+      margin-top: 16px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.15s;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: #c9f042;
+      color: #0a0a0a;
+    }
+
+    .btn-primary:hover {
+      background: #d4f55d;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: #606060;
+      padding: 10px 16px;
+    }
+
+    .btn-ghost:hover {
+      color: #909090;
+    }
+
+    /* Status message */
+    .status-message {
+      padding: 10px 14px;
+      font-size: 13px;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .status-message.success {
+      display: inline-block;
+      background: #0d2818;
+      color: #81c995;
+    }
+
+    .status-message.error {
+      display: inline-block;
+      background: #2a1215;
+      color: #f28b82;
+    }
+
+    /* Keyboard shortcut hint */
+    kbd {
+      background: #1a1a1a;
+      border: 1px solid #252525;
+      border-radius: 3px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-family: inherit;
+      color: #707070;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Settings</h1>
+      <p>Configure how Tab Manager organizes your tabs</p>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-title">Grouping</div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">Auto-collapse groups</div>
+          <div class="setting-description">Collapse groups after creating them</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="autoCollapse">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">Collapse threshold</div>
+          <div class="setting-description">Only collapse groups larger than this</div>
+        </div>
+        <input type="number" class="setting-number" id="collapseThreshold" min="1" max="50" value="3">
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">Minimum tabs to group</div>
+          <div class="setting-description">Domains with fewer tabs won't be grouped</div>
+        </div>
+        <input type="number" class="setting-number" id="minTabsToGroup" min="1" max="10" value="1">
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">Strip www prefix</div>
+          <div class="setting-description">Show "Github" instead of "www.github.com"</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="removeWww" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">Use full domain name</div>
+          <div class="setting-description">Show "github.com" instead of "Github"</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="useFullDomain">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-title">Duplicate Detection</div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">Ignore URL fragments</div>
+          <div class="setting-description">Treat page.html#section1 and page.html#section2 as duplicates</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="ignoreFragments" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">Ignore query parameters</div>
+          <div class="setting-description">Treat page?a=1 and page?b=2 as duplicates</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="ignoreQueryParams">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">Pre-select duplicates</div>
+          <div class="setting-description">Automatically check duplicate tabs for closing</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="autoSelectDuplicates" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-title">Appearance</div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">Group color</div>
+          <div class="setting-description">How tab groups are colored</div>
+        </div>
+        <select class="setting-select" id="defaultColor">
+          <option value="auto">Auto (by domain)</option>
+          <option value="grey">Grey</option>
+          <option value="blue">Blue</option>
+          <option value="red">Red</option>
+          <option value="yellow">Yellow</option>
+          <option value="green">Green</option>
+          <option value="pink">Pink</option>
+          <option value="purple">Purple</option>
+          <option value="cyan">Cyan</option>
+          <option value="orange">Orange</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <div>
+        <span id="statusMessage" class="status-message"></span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-ghost" id="resetDefaults">Reset</button>
+        <button class="btn btn-primary" id="saveSettings">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Manager</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+      width: 320px;
+      min-height: 200px;
+      max-height: 520px;
+      overflow-y: auto;
+      background: #0f0f0f;
+      color: #e0e0e0;
+    }
+
+    /* Header - minimal, functional */
+    .header {
+      padding: 14px 16px;
+      border-bottom: 1px solid #2a2a2a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
+
+    .settings-link {
+      font-size: 11px;
+      color: #707070;
+      text-decoration: none;
+      padding: 4px 8px;
+      border: 1px solid #2a2a2a;
+      border-radius: 3px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .settings-link:hover {
+      color: #a0a0a0;
+      border-color: #404040;
+    }
+
+    /* Stats row - horizontal, compact */
+    .stats {
+      display: flex;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .stat-card {
+      flex: 1;
+      padding: 12px 16px;
+      text-align: center;
+      border-right: 1px solid #2a2a2a;
+    }
+
+    .stat-card:last-child {
+      border-right: none;
+    }
+
+    .stat-number {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: #606060;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+
+    /* Actions */
+    .actions {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 3px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+
+    .btn-primary {
+      background: #c9f042;
+      color: #0a0a0a;
+    }
+
+    .btn-primary:hover {
+      background: #d4f55d;
+    }
+
+    .btn-secondary {
+      background: #1a1a1a;
+      color: #c0c0c0;
+      border: 1px solid #2a2a2a;
+    }
+
+    .btn-secondary:hover {
+      background: #222;
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: #d93025;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #ea4335;
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Button row for smaller actions */
+    .btn-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-small {
+      flex: 1;
+      background: #1a1a1a;
+      color: #909090;
+      border: 1px solid #252525;
+      padding: 7px 8px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .btn-small:hover {
+      background: #222;
+      color: #c0c0c0;
+      border-color: #333;
+    }
+
+    .icon {
+      font-size: 14px;
+    }
+
+    /* Status message */
+    .status-message {
+      padding: 10px 12px;
+      margin: 0 12px 12px;
+      font-size: 12px;
+      display: none;
+      border-radius: 3px;
+    }
+
+    .status-message.success {
+      display: block;
+      background: #0d2818;
+      border-left: 3px solid #34a853;
+      color: #81c995;
+    }
+
+    .status-message.error {
+      display: block;
+      background: #2a1215;
+      border-left: 3px solid #d93025;
+      color: #f28b82;
+    }
+
+    /* Duplicates section */
+    .section {
+      padding: 0 12px 12px;
+    }
+
+    .section-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: #606060;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .duplicate-list {
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    .duplicate-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .duplicate-item:last-child {
+      border-bottom: none;
+    }
+
+    .duplicate-checkbox {
+      width: 16px;
+      height: 16px;
+      accent-color: #c9f042;
+      flex-shrink: 0;
+    }
+
+    .duplicate-info {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+      padding: 4px 6px;
+      margin: -4px -6px;
+      border-radius: 3px;
+      transition: background-color 0.15s;
+    }
+
+    .duplicate-info:hover {
+      background-color: #1a1a1a;
+    }
+
+    .duplicate-title {
+      font-size: 12px;
+      color: #d0d0d0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .duplicate-url {
+      font-size: 11px;
+      color: #505050;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    .duplicate-count {
+      background: #2a1215;
+      color: #f28b82;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 2px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .no-duplicates {
+      text-align: center;
+      padding: 24px 16px;
+      color: #505050;
+    }
+
+    .no-duplicates .icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+      opacity: 0.6;
+    }
+
+    .no-duplicates div:last-child {
+      font-size: 12px;
+    }
+
+    .select-actions {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .select-actions button {
+      flex: 1;
+      padding: 5px;
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Tab Manager</h1>
+    <a href="#" id="openSettings" class="settings-link">Settings</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-number" id="tabCount">-</div>
+      <div class="stat-label">Tabs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="domainCount">-</div>
+      <div class="stat-label">Domains</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="duplicateCount">-</div>
+      <div class="stat-label">Dupes</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="groupByDomain">
+      <span class="icon">▤</span>
+      Group by Domain
+    </button>
+    <button class="btn btn-secondary" id="findDuplicates">
+      <span class="icon">⊘</span>
+      Find Duplicates
+    </button>
+    <div class="btn-row">
+      <button class="btn btn-small" id="expandAll">Expand</button>
+      <button class="btn btn-small" id="collapseAll">Collapse</button>
+      <button class="btn btn-small" id="ungroupAll">Ungroup</button>
+    </div>
+  </div>
+
+  <div id="statusMessage" class="status-message"></div>
+
+  <div id="duplicatesSection" class="section" style="display: none;">
+    <div class="section-title">Duplicates Found</div>
+    <div class="select-actions">
+      <button class="btn btn-secondary" id="selectAll">All</button>
+      <button class="btn btn-secondary" id="selectNone">None</button>
+    </div>
+    <div class="duplicate-list" id="duplicateList"></div>
+    <button class="btn btn-danger" id="closeSelected" style="margin-top: 10px; width: 100%;">
+      Close Selected
+    </button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
