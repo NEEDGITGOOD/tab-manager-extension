@@ -2,6 +2,10 @@
 
 A browser extension for Chromium-based browsers (Chrome, Brave, Edge) that helps you organize tabs by grouping them by domain and finding duplicate tabs.
 
+<img width="319" height="483" alt="image" src="https://github.com/user-attachments/assets/17603f51-309c-41df-8190-0e25df3d7d5e" />
+
+Icon: <img width="31" height="30" alt="image" src="https://github.com/user-attachments/assets/af1b07df-a0cc-4785-910d-ba411ae73084" />
+
 ## Features
 
 **Group by Domain** — Automatically organizes all open tabs into color-coded groups based on their domain. Tabs from `github.com` go into a "Github" group, tabs from `youtube.com` into a "Youtube" group, and so on.
