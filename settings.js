@@ -8,6 +8,8 @@ const defaultSettings = {
   useFullDomain: false,
   
   // Duplicate detection
+  autoCloseDuplicates: false,
+  switchToOriginal: false,
   ignoreFragments: true,
   ignoreQueryParams: false,
   autoSelectDuplicates: true,
@@ -28,6 +30,8 @@ async function loadSettings() {
     document.getElementById('minTabsToGroup').value = settings.minTabsToGroup;
     document.getElementById('removeWww').checked = settings.removeWww;
     document.getElementById('useFullDomain').checked = settings.useFullDomain;
+    document.getElementById('autoCloseDuplicates').checked = settings.autoCloseDuplicates;
+    document.getElementById('switchToOriginal').checked = settings.switchToOriginal;
     document.getElementById('ignoreFragments').checked = settings.ignoreFragments;
     document.getElementById('ignoreQueryParams').checked = settings.ignoreQueryParams;
     document.getElementById('autoSelectDuplicates').checked = settings.autoSelectDuplicates;
@@ -45,6 +49,8 @@ async function saveSettings() {
     minTabsToGroup: parseInt(document.getElementById('minTabsToGroup').value) || 1,
     removeWww: document.getElementById('removeWww').checked,
     useFullDomain: document.getElementById('useFullDomain').checked,
+    autoCloseDuplicates: document.getElementById('autoCloseDuplicates').checked,
+    switchToOriginal: document.getElementById('switchToOriginal').checked,
     ignoreFragments: document.getElementById('ignoreFragments').checked,
     ignoreQueryParams: document.getElementById('ignoreQueryParams').checked,
     autoSelectDuplicates: document.getElementById('autoSelectDuplicates').checked,

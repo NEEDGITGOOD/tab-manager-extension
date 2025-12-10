@@ -10,6 +10,8 @@ const DEFAULT_SETTINGS = {
   useFullDomain: false,
   
   // Duplicate detection
+  autoCloseDuplicates: false,
+  switchToOriginal: false,
   ignoreFragments: true,
   ignoreQueryParams: false,
   autoSelectDuplicates: true,

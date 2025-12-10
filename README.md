@@ -2,15 +2,13 @@
 
 A browser extension for Chromium-based browsers (Chrome, Brave, Edge) that helps you organize tabs by grouping them by domain and finding duplicate tabs.
 
-<img width="319" height="483" alt="image" src="https://github.com/user-attachments/assets/17603f51-309c-41df-8190-0e25df3d7d5e" />
-
-Icon: <img width="31" height="30" alt="image" src="https://github.com/user-attachments/assets/af1b07df-a0cc-4785-910d-ba411ae73084" />
-
 ## Features
 
 **Group by Domain** — Automatically organizes all open tabs into color-coded groups based on their domain. Tabs from `github.com` go into a "Github" group, tabs from `youtube.com` into a "Youtube" group, and so on.
 
 **Find Duplicates** — Scans your open tabs for duplicates and lets you close them with one click. Click on any duplicate in the list to switch to that tab and verify which one to keep.
+
+**Auto-Close Duplicates** — When enabled, automatically closes any new tab that's a duplicate of an existing tab and switches to the original. Enable this in Settings.
 
 **Badge Counter** — The extension icon displays a badge showing how many duplicate tabs you currently have open, updated in real-time as you browse.
 
@@ -63,6 +61,8 @@ Access settings by clicking "Settings" in the popup header, or right-click the e
 
 | Setting | Description | Default |
 |---------|-------------|---------|
+| Auto-close duplicates | Instantly close tabs that duplicate an existing tab | Off |
+| Switch to original tab | When auto-closing, switch focus to the existing tab | Off |
 | Ignore URL fragments | Treat `page#a` and `page#b` as duplicates | On |
 | Ignore query parameters | Treat `page?a=1` and `page?b=2` as duplicates | Off |
 | Pre-select duplicates | Automatically check duplicates for closing | On |
