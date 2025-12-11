@@ -9,6 +9,56 @@ const DEFAULT_SETTINGS = {
   ignoreQueryParams: false
 };
 
+// Storage key for duplicate history
+const DUPLICATE_HISTORY_KEY = 'duplicateHistory';
+const MAX_HISTORY_ITEMS = 50;
+
+// Add entry to duplicate history
+async function addToHistory(closedTab, originalTab) {
+  try {
+    const result = await chrome.storage.local.get(DUPLICATE_HISTORY_KEY);
+    const history = result[DUPLICATE_HISTORY_KEY] || [];
+
+    // Add new entry at the beginning
+    history.unshift({
+      closedTab: {
+        title: closedTab.title || 'Untitled',
+        url: closedTab.url
+      },
+      originalTab: {
+        title: originalTab.title || 'Untitled',
+        url: originalTab.url
+      },
+      timestamp: Date.now()
+    });
+
+    // Keep only the last MAX_HISTORY_ITEMS entries
+    if (history.length > MAX_HISTORY_ITEMS) {
+      history.length = MAX_HISTORY_ITEMS;
+    }
+
+    await chrome.storage.local.set({ [DUPLICATE_HISTORY_KEY]: history });
+  } catch (error) {
+    console.error('Error adding to history:', error);
+  }
+}
+
+// Show notification for closed duplicate
+async function showDuplicateNotification(closedTab, originalTab) {
+  try {
+    const domain = new URL(closedTab.url).hostname.replace(/^www\./, '');
+    await chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'icons/icon128.png',
+      title: 'Duplicate Tab Closed',
+      message: `"${closedTab.title || domain}" was already open`,
+      priority: 0
+    });
+  } catch (error) {
+    console.error('Error showing notification:', error);
+  }
+}
+
 // Load settings from storage
 async function loadSettings() {
   try {
@@ -71,30 +121,40 @@ async function updateDuplicateBadge() {
 async function checkAndCloseDuplicate(tabId, url) {
   try {
     const settings = await loadSettings();
-    
+
     if (!settings.autoCloseDuplicates || !url) {
       return;
     }
-    
+
     // Skip internal browser pages
-    if (url.startsWith('chrome://') || url.startsWith('brave://') || 
+    if (url.startsWith('chrome://') || url.startsWith('brave://') ||
         url.startsWith('edge://') || url.startsWith('about:')) {
       return;
     }
-    
+
     const normalizedNewUrl = normalizeUrl(url, settings);
     const tabs = await chrome.tabs.query({ currentWindow: true });
-    
+
     // Find existing tabs with the same URL (excluding the new tab)
     const existingTab = tabs.find(tab => {
       if (tab.id === tabId) return false;
       if (!tab.url) return false;
       return normalizeUrl(tab.url, settings) === normalizedNewUrl;
     });
-    
+
     if (existingTab) {
+      // Get the tab info before closing (for notification and history)
+      const closedTab = tabs.find(tab => tab.id === tabId);
+
       // Close the new duplicate tab
       await chrome.tabs.remove(tabId);
+
+      // Log to history and show notification
+      if (closedTab) {
+        await addToHistory(closedTab, existingTab);
+        await showDuplicateNotification(closedTab, existingTab);
+      }
+
       // Switch to the existing tab only if setting is enabled
       if (settings.switchToOriginal) {
         await chrome.tabs.update(existingTab.id, { active: true });

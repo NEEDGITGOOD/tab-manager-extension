@@ -297,6 +297,89 @@
       padding: 5px;
       font-size: 10px;
     }
+
+    /* History section */
+    .history-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-title {
+      font-size: 12px;
+      color: #d0d0d0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    .history-url {
+      font-size: 11px;
+      color: #505050;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .history-time {
+      font-size: 10px;
+      color: #404040;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+
+    .history-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .history-empty {
+      text-align: center;
+      padding: 16px;
+      color: #505050;
+      font-size: 12px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .history-header .section-title {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .clear-history-btn {
+      font-size: 10px;
+      color: #606060;
+      background: none;
+      border: 1px solid #2a2a2a;
+      padding: 3px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .clear-history-btn:hover {
+      color: #f28b82;
+      border-color: #f28b82;
+    }
   </style>
 </head>
 <body>
@@ -348,6 +431,14 @@
     <button class="btn btn-danger" id="closeSelected" style="margin-top: 10px; width: 100%;">
       Close Selected
     </button>
+  </div>
+
+  <div id="historySection" class="section" style="display: none;">
+    <div class="history-header">
+      <div class="section-title">Auto-Closed History</div>
+      <button class="clear-history-btn" id="clearHistory">Clear</button>
+    </div>
+    <div class="history-list" id="historyList"></div>
   </div>
 
   <script src="popup.js"></script>
