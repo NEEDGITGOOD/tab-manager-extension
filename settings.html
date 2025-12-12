@@ -250,6 +250,205 @@
       font-family: inherit;
       color: #707070;
     }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #1a1a1a;
+      margin-bottom: 32px;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #606060;
+      background: none;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    .tab:hover {
+      color: #909090;
+    }
+
+    .tab.active {
+      color: #c9f042;
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #c9f042;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* History styles */
+    .history-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid #151515;
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-favicon {
+      width: 32px;
+      height: 32px;
+      background: #1a1a1a;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .history-favicon img {
+      width: 18px;
+      height: 18px;
+    }
+
+    .history-favicon-fallback {
+      color: #505050;
+      font-size: 14px;
+    }
+
+    .history-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .history-title {
+      font-size: 14px;
+      color: #e0e0e0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-title a {
+      color: #e0e0e0;
+      text-decoration: none;
+    }
+
+    .history-title a:hover {
+      color: #c9f042;
+    }
+
+    .history-domain {
+      font-size: 12px;
+      color: #707070;
+      margin-top: 2px;
+    }
+
+    .history-url {
+      font-size: 11px;
+      color: #404040;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 4px;
+      padding: 4px 6px;
+      background: #0f0f0f;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+
+    .history-url a {
+      color: #505050;
+      text-decoration: none;
+    }
+
+    .history-url a:hover {
+      color: #c9f042;
+    }
+
+    .history-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .history-time {
+      font-size: 11px;
+      color: #404040;
+    }
+
+    .history-action {
+      font-size: 10px;
+      color: #505050;
+      background: #1a1a1a;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .history-empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: #404040;
+    }
+
+    .history-empty-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .history-empty-text {
+      font-size: 14px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .history-count {
+      font-size: 12px;
+      color: #505050;
+    }
+
+    .btn-clear {
+      background: transparent;
+      color: #606060;
+      border: 1px solid #252525;
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-clear:hover {
+      color: #f28b82;
+      border-color: #f28b82;
+    }
+
+    .history-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -259,6 +458,12 @@
       <p>Configure how Tab Manager organizes your tabs</p>
     </div>
 
+    <div class="tabs">
+      <button class="tab active" data-tab="settings">Settings</button>
+      <button class="tab" data-tab="history">History</button>
+    </div>
+
+    <div id="settingsTab" class="tab-content active">
     <div class="settings-section">
       <div class="section-title">Grouping</div>
 
@@ -401,6 +606,20 @@
       <div style="display: flex; gap: 8px;">
         <button class="btn btn-ghost" id="resetDefaults">Reset</button>
         <button class="btn btn-primary" id="saveSettings">Save Changes</button>
+      </div>
+    </div>
+    </div>
+
+    <div id="historyTab" class="tab-content">
+      <div class="history-header">
+        <span class="history-count" id="historyCount">0 items</span>
+        <button class="btn-clear" id="clearHistory">Clear History</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty">
+          <div class="history-empty-icon">⊘</div>
+          <div class="history-empty-text">No auto-closed duplicates yet</div>
+        </div>
       </div>
     </div>
   </div>

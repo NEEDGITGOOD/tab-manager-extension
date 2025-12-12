@@ -1,8 +1,5 @@
 // Tab Manager Extension - Main Logic
 
-// Storage key for duplicate history (synced with background.js)
-const DUPLICATE_HISTORY_KEY = 'duplicateHistory';
-
 // Default settings (synced with settings.js)
 const DEFAULT_SETTINGS = {
   // Grouping options
@@ -436,76 +433,48 @@ async function ungroupAllTabs() {
   }
 }
 
-// Format relative time for history display
-function formatRelativeTime(timestamp) {
-  const now = Date.now();
-  const diff = now - timestamp;
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (days > 0) return `${days}d ago`;
-  if (hours > 0) return `${hours}h ago`;
-  if (minutes > 0) return `${minutes}m ago`;
-  return 'just now';
-}
-
-// Load and display duplicate history
-async function loadHistory() {
+// Load and update the auto-close toggle state
+async function loadAutoCloseToggle() {
   try {
-    const result = await chrome.storage.local.get(DUPLICATE_HISTORY_KEY);
-    const history = result[DUPLICATE_HISTORY_KEY] || [];
-    displayHistory(history);
+    const settings = await loadSettings();
+    const toggle = document.getElementById('autoCloseToggle');
+    const label = document.getElementById('autoCloseLabel');
+    toggle.checked = settings.autoCloseDuplicates;
+    if (settings.autoCloseDuplicates) {
+      label.classList.add('active');
+    } else {
+      label.classList.remove('active');
+    }
   } catch (error) {
-    console.error('Error loading history:', error);
+    console.error('Error loading auto-close toggle:', error);
   }
 }
 
-// Display history in the UI
-function displayHistory(history) {
-  const section = document.getElementById('historySection');
-  const list = document.getElementById('historyList');
-
-  if (history.length === 0) {
-    section.style.display = 'none';
-    return;
-  }
-
-  section.style.display = 'block';
-
-  const html = history.map(entry => {
-    const domain = getDomain(entry.closedTab.url) || entry.closedTab.url;
-    return `
-      <div class="history-item">
-        <div class="history-title">${escapeHtml(entry.closedTab.title)}</div>
-        <div class="history-meta">
-          <div class="history-url">${escapeHtml(domain)}</div>
-          <div class="history-time">${formatRelativeTime(entry.timestamp)}</div>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  list.innerHTML = html;
-}
-
-// Clear duplicate history
-async function clearHistory() {
+// Toggle auto-close duplicates setting
+async function toggleAutoClose() {
   try {
-    await chrome.storage.local.remove(DUPLICATE_HISTORY_KEY);
-    displayHistory([]);
-    showStatus('History cleared');
+    const toggle = document.getElementById('autoCloseToggle');
+    const label = document.getElementById('autoCloseLabel');
+    const settings = await loadSettings();
+    settings.autoCloseDuplicates = toggle.checked;
+    await chrome.storage.sync.set({ tabManagerSettings: settings });
+    if (toggle.checked) {
+      label.classList.add('active');
+      showStatus('Auto-close enabled');
+    } else {
+      label.classList.remove('active');
+      showStatus('Auto-close disabled');
+    }
   } catch (error) {
-    console.error('Error clearing history:', error);
-    showStatus('Error clearing history', 'error');
+    console.error('Error toggling auto-close:', error);
+    showStatus('Error updating setting', 'error');
   }
 }
 
 // Initialize popup
 document.addEventListener('DOMContentLoaded', () => {
   updateStats();
-  loadHistory();
+  loadAutoCloseToggle();
 
   document.getElementById('groupByDomain').addEventListener('click', groupTabsByDomain);
   document.getElementById('findDuplicates').addEventListener('click', findDuplicates);
@@ -515,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('expandAll').addEventListener('click', expandAllGroups);
   document.getElementById('collapseAll').addEventListener('click', collapseAllGroups);
   document.getElementById('ungroupAll').addEventListener('click', ungroupAllTabs);
-  document.getElementById('clearHistory').addEventListener('click', clearHistory);
+  document.getElementById('autoCloseToggle').addEventListener('change', toggleAutoClose);
 
   // Open settings page
   document.getElementById('openSettings').addEventListener('click', (e) => {
