@@ -471,10 +471,49 @@ async function toggleAutoClose() {
   }
 }
 
+// Load and update the switch-to-original toggle state
+async function loadSwitchToOriginalToggle() {
+  try {
+    const settings = await loadSettings();
+    const toggle = document.getElementById('switchToOriginalToggle');
+    const label = document.getElementById('switchToOriginalLabel');
+    toggle.checked = settings.switchToOriginal;
+    if (settings.switchToOriginal) {
+      label.classList.add('active');
+    } else {
+      label.classList.remove('active');
+    }
+  } catch (error) {
+    console.error('Error loading switch-to-original toggle:', error);
+  }
+}
+
+// Toggle switch-to-original setting
+async function toggleSwitchToOriginal() {
+  try {
+    const toggle = document.getElementById('switchToOriginalToggle');
+    const label = document.getElementById('switchToOriginalLabel');
+    const settings = await loadSettings();
+    settings.switchToOriginal = toggle.checked;
+    await chrome.storage.sync.set({ tabManagerSettings: settings });
+    if (toggle.checked) {
+      label.classList.add('active');
+      showStatus('Switch to original enabled');
+    } else {
+      label.classList.remove('active');
+      showStatus('Switch to original disabled');
+    }
+  } catch (error) {
+    console.error('Error toggling switch-to-original:', error);
+    showStatus('Error updating setting', 'error');
+  }
+}
+
 // Initialize popup
 document.addEventListener('DOMContentLoaded', () => {
   updateStats();
   loadAutoCloseToggle();
+  loadSwitchToOriginalToggle();
 
   document.getElementById('groupByDomain').addEventListener('click', groupTabsByDomain);
   document.getElementById('findDuplicates').addEventListener('click', findDuplicates);
@@ -485,6 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('collapseAll').addEventListener('click', collapseAllGroups);
   document.getElementById('ungroupAll').addEventListener('click', ungroupAllTabs);
   document.getElementById('autoCloseToggle').addEventListener('change', toggleAutoClose);
+  document.getElementById('switchToOriginalToggle').addEventListener('change', toggleSwitchToOriginal);
 
   // Open settings page
   document.getElementById('openSettings').addEventListener('click', (e) => {
